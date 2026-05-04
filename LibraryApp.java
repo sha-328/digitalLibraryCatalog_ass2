@@ -1,3 +1,5 @@
+import java.util.Scanner;
+
 abstract class LibraryItem {
     // Encapsulation: Private attributes
     private String title;
@@ -134,4 +136,104 @@ class LibrarySecurity {
 
 // Member 3
 public class LibraryApp {
+
+    public static void main(String[] args) {
+
+        Scanner scanner = new Scanner(System.in);
+
+        // Create library items
+        Book item1 = new Book("The Great Gatsby", "B001", "F. Scott Fitzgerald");
+        DVD item2 = new DVD("Oppenheimer", "D001", 160);
+
+        // Display details of library items
+         System.out.println("Available Library Items:");
+            item1.showDetails();
+            item2.showDetails();
+
+        // Create a member
+        Member member1 = new Member("M001", "Muhammad Reza");
+
+        //access control loop
+        boolean accessgranted = false;
+
+        while(accessgranted == false) {
+
+            //Verify member
+            System.out.println("Enter Member ID : ");
+            String memberId = scanner.nextLine();
+       
+            if(LibrarySecurity.validateMemberId(memberId) == true) {
+
+                accessgranted = true;
+                member1.showMemberDetails();
+                System.out.println("Member is valid. Access granted.");
+
+                int choice;
+                    do {
+                        System.out.println("\nMenu:");
+                        System.out.println("1. View Loan Records");
+                        System.out.println("2. Borrow an Item");
+                        System.out.println("3. Return an Item");
+                        System.out.println("4. Exit");
+                        System.out.print("Enter your choice: ");
+                        choice = scanner.nextInt();
+                        scanner.nextLine(); // Consume newline
+    
+                        switch (choice) {
+                            case 1:
+                                if (!item1.getIsAvailable() == true) {
+                                    LoanRecord loan1 = new LoanRecord(item1, member1, "2026-04-25", "Not returned");
+                                    loan1.showLoanDetails();
+                                    item1.setIsAvailable(false);
+
+                                } else {
+                                    System.out.println("You have no current loans.");
+                                }
+                                break;
+
+                            case 2:
+                                item1.showDetails();
+                                item2.showDetails();
+                                System.out.print("Enter the ID of the item you want to borrow: ");
+                                String itemId = scanner.nextLine();         
+                                if (LibrarySecurity.validateItemId(itemId)) {
+                                    if (itemId.equals(item1.getItemId()) && item1.getIsAvailable()) {
+                                        LoanRecord loan2 = new LoanRecord(item1, member1, "2026-04-25", "Not returned");
+                                        System.out.println("You have borrowed: " + item1.getTitle());
+                                    } else if (itemId.equals(item2.getItemId()) && item2.getIsAvailable()) {
+                                        LoanRecord loan3 = new LoanRecord(item2, member1, "2026-04-25", "Not returned");
+                                        System.out.println("You have borrowed: " + item2.getTitle());
+                                    } else {
+                                        System.out.println("Sorry, that item is currently unavailable.");
+                                    }
+                                } else {
+                                    System.out.println("Invalid Item ID. Please try again.");
+                                }
+
+                                break;
+                            case 3:
+                                if (!item1.getIsAvailable()) {
+                                    LoanRecord loan3 = new LoanRecord(item1, member1, "2026-04-25", "Not returned");
+                                    loan3.returnItem("2026-04-15");
+                                    System.out.println("You have returned: " + item1.getTitle());
+                                } else {
+                                    System.out.println("You have no items to return.");
+                                }
+                                break;
+                            case 4:
+                                System.out.println("Exiting the system. See you next time!");
+                                break;
+                            default:
+                                System.out.println("Invalid choice. Please try again.");
+                        }
+                    } while (choice != 4);
+
+            }
+
+            else if (LibrarySecurity.validateMemberId(memberId) == false) {
+                System.out.println("Member is invalid. Access denied. Please enter a valid Member ID:");
+                accessgranted = false;
+            }
+        }
+    }
 }
